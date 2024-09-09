@@ -8,7 +8,7 @@ pub enum RPCEvent {
   VoiceChannelSelect,
   VoiceStateCreate,
   VoiceStateDelete,
-  VoiceStateUpdate,
+  VoiceStateUpdate { channel_id: String },
   VoiceSettingsUpdate,
   VoiceConnectionStatus,
   SpeakingStart { channel_id: String },

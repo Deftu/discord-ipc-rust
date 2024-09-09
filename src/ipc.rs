@@ -2,6 +2,7 @@ use crate::create_json;
 use crate::ipc_socket::DiscordIpcSocket;
 use crate::models::events::EventReturn;
 use crate::models::rpc_command::RPCCommand;
+use crate::models::shared::User;
 use crate::opcodes::OPCODES;
 use crate::EventReceive;
 use crate::Result;
@@ -9,6 +10,11 @@ use serde_json::json;
 use uuid::Uuid;
 
 // Environment keys to search for the Discord pipe
+
+pub struct DiscordIpcConstruction {
+  pub client: DiscordIpcClient,
+  pub self_user: User,
+}
 
 #[allow(dead_code)]
 #[allow(missing_docs)]
@@ -19,7 +25,7 @@ pub struct DiscordIpcClient {
   pub client_id: String,
   pub access_token: String,
   // Socket ref to the open socket
-  socket: DiscordIpcSocket,
+  pub socket: DiscordIpcSocket,
 }
 
 impl DiscordIpcClient {
@@ -29,7 +35,7 @@ impl DiscordIpcClient {
   /// ```
   /// let ipc_client = DiscordIpcClient::new("<some client id>", "<some access token>")?;
   /// ```
-  pub async fn new(client_id: &str, access_token: &str) -> Result<Self> {
+  pub async fn setup(client_id: &str, access_token: &str) -> Result<DiscordIpcConstruction> {
     let socket = DiscordIpcSocket::new().await?;
 
     let mut client = Self {
@@ -39,37 +45,39 @@ impl DiscordIpcClient {
     };
 
     // connect to client
-    client.connect().await?;
+    let self_user = client.connect().await?;
 
     // use the access_token to login
     client.login(access_token).await.ok();
 
-    Ok(client)
+    Ok(DiscordIpcConstruction { client, self_user })
   }
 
   /// Connects the client to the Discord IPC
   ///
   /// This method attempts to first establish a connection,
   /// and then sends a handshake
-  async fn connect(&mut self) -> Result<()> {
+  pub async fn connect(&mut self) -> Result<User> {
     println!("Connecting to client...");
 
     self.send_handshake().await?;
 
     let (_opcode, payload) = self.socket.recv().await?;
+    let mut self_user: Option<User> = None;
 
     // spooky line is not working
     let payload = serde_json::from_str(&payload)?;
     match payload {
-      EventReturn::Ready { .. } => {
+      EventReturn::Ready { data } => {
         println!("Connected to discord and got ready event!");
+        self_user = Some(data.user);
       }
       _ => {
         println!("Could not connect to discord...");
       }
     }
 
-    Ok(())
+    Ok(self_user.unwrap())
   }
 
   /// Handshakes the Discord IPC.
@@ -154,6 +162,7 @@ impl DiscordIpcClient {
     tokio::spawn(async move {
       loop {
         let (_opcode, payload) = socket_clone.recv().await.unwrap();
+
         match serde_json::from_str::<EventReceive>(&payload) {
           Ok(e) => {
             // TODO: give the consumer a ready event so they can sub to events

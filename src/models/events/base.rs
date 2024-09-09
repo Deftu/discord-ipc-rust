@@ -4,6 +4,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
 use crate::models::commands::SpeakingData;
+use crate::models::shared::VoiceState;
 
 use super::error::ErrorData;
 use super::login::LoginData;
@@ -33,11 +34,13 @@ pub enum EventReturn {
     data: SpeakingData,
   },
 
-  // TODO: type these payloads
-  GetSelelectedVoiceChannel {
-    data: HashMap<String, Value>,
-  },
+  /// voice state update
   VoiceStateUpdate {
+    data: VoiceState,
+  },
+
+  // TODO: type these payloads
+  GetSelectedVoiceChannel {
     data: HashMap<String, Value>,
   },
   VoiceStateCreate {

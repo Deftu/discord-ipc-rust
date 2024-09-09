@@ -19,14 +19,10 @@ keywords = ["discord", "ipc", "RPC", "client"]
 doctest = false
 
 [dependencies]
-serde = { version = "1.0.144", features = ["derive"] }
-serde_json = { version = "1.0.85", features = ["preserve_order"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = { version = "1.0", features = ["preserve_order"] }
 uuid = { version = "0.8", features = ["v4"] }
 tokio = { version = "1.21.1", features = ["full"] }
 thiserror = "1.0.37"
 # TODO: we don't need this as a hard dep
 dotenv = "0.15.0"
-
-[[example]]
-name = "simple"
-path = "examples/simple/src/main.rs"

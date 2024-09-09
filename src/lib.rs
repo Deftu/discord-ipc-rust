@@ -4,8 +4,8 @@ pub mod errors;
 pub mod models;
 pub mod opcodes;
 
-mod ipc;
-mod ipc_socket;
+pub mod ipc;
+pub mod ipc_socket;
 
 use serde::{Deserialize, Serialize};
 

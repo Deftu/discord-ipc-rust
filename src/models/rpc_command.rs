@@ -19,7 +19,7 @@ pub enum RPCCommand {
   GetRelationships,
   GetUser,
   Subscribe(RPCEvent),
-  Unsubscribe,
+  Unsubscribe(RPCEvent),
   SetUserVoiceSettings,
   SelectVoiceChannel { channel_id: String },
   GetSelectedVoiceChannel,

@@ -30,7 +30,7 @@ type ReadHalfType = OwnedReadHalf;
 type WriteHalfType = OwnedWriteHalf;
 
 #[derive(Clone)]
-pub(crate) struct DiscordIpcSocket {
+pub struct DiscordIpcSocket {
   read_half: Arc<Mutex<ReadHalfType>>,
   write_half: Arc<Mutex<WriteHalfType>>,
 }
@@ -43,7 +43,7 @@ impl DiscordIpcSocket {
       Some(p) => p,
       None => return Result::Err(DiscordRPCError::PipeNotFound),
     };
-    if let Ok(client) = ClientOptions::new().open(&path) {
+    if let Ok(client) = ClientOptions::new().open(path) {
       let (read_half, write_half) = tokio::io::split(client);
       return Ok((read_half, write_half));
     }
@@ -65,7 +65,7 @@ impl DiscordIpcSocket {
     Err(DiscordRPCError::CouldNotConnect)
   }
 
-  pub(crate) async fn new() -> Result<Self> {
+  pub async fn new() -> Result<Self> {
     let (read_half, write_half) = Self::get_inner_socket().await?;
     Ok(Self {
       read_half: Arc::new(Mutex::new(read_half)),
@@ -73,19 +73,19 @@ impl DiscordIpcSocket {
     })
   }
 
-  pub(crate) async fn write(&mut self, buf: &[u8]) -> Result<()> {
+  pub async fn write(&mut self, buf: &[u8]) -> Result<()> {
     let mut socket = self.write_half.lock().await;
     socket.write_all(buf).await?;
     Ok(())
   }
 
-  pub(crate) async fn read(&mut self, buf: &mut [u8]) -> Result<()> {
+  pub async fn read(&mut self, buf: &mut [u8]) -> Result<()> {
     let mut socket = self.read_half.lock().await;
     socket.read_exact(buf).await?;
     Ok(())
   }
 
-  pub(crate) async fn send(&mut self, data: &str, opcode: u8) -> Result<()> {
+  pub async fn send(&mut self, data: &str, opcode: u8) -> Result<()> {
     let mut packet = pack(opcode.into(), data.len() as u32)?;
 
     packet.extend(data.as_bytes());
@@ -95,7 +95,7 @@ impl DiscordIpcSocket {
     Ok(())
   }
 
-  pub(crate) async fn recv(&mut self) -> Result<(u32, String)> {
+  pub async fn recv(&mut self) -> Result<(u32, String)> {
     let mut header = [0u8; 8];
     self.read(&mut header).await?;
     let (op, length) = unpack(header.to_vec())?;
