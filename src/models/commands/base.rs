@@ -8,7 +8,7 @@ use super::ChannelData;
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(tag = "cmd")]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
-pub enum CommandReturn {
+pub enum ReturnedCommand {
     GetSelectedVoiceChannel {
         data: Option<ChannelData>,
     },

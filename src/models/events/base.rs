@@ -14,7 +14,7 @@ use super::ready::ReadyData;
 #[serde(tag = "evt")]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 /// All events that come back from the discord RPC
-pub enum EventReturn {
+pub enum ReturnedEvent {
     Ready {
         data: ReadyData,
     },

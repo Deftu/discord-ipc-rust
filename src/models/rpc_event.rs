@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 // TODO: move this to somewhere else
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE", tag = "evt", content = "args")]
-pub enum RPCEvent {
+pub enum SentEvent {
     Ready,
     Error,
     GuildStatus,

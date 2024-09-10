@@ -3,20 +3,20 @@ use serde_json::Value;
 
 use crate::Result;
 
-use super::rpc_event::RPCEvent;
+use super::rpc_event::SentEvent;
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE", tag = "cmd", content = "args")]
-pub enum RPCCommand {
+pub enum SentCommand {
     Dispatch,
-    Authorize,
+    Authorize(AuthorizeData),
     Authenticate { access_token: String },
-    GetGuild,
+    GetGuild(GetGuildData),
     GetGuilds,
     GetChannel,
     GetChannels,
-    Subscribe(RPCEvent),
-    Unsubscribe(RPCEvent),
+    Subscribe(SentEvent),
+    Unsubscribe(SentEvent),
     SetUserVoiceSettings,
     SelectVoiceChannel,
     GetSelectedVoiceChannel,
@@ -29,7 +29,7 @@ pub enum RPCCommand {
     CloseActivityRequest,
 }
 
-impl RPCCommand {
+impl SentCommand {
     pub(crate) fn to_json(&self) -> Result<Value> {
         let command_json = match self {
             Self::Subscribe(event) => {
@@ -65,4 +65,24 @@ impl RPCCommand {
         println!("{}", serde_json::to_string_pretty(&command_json)?);
         Ok(command_json)
     }
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct AuthorizeData {
+    /// Array of OAuth2 scopes - Scopes to authorize
+    pub scopes: Vec<String>,
+    /// string - OAuth2 application ID
+    pub client_id: String,
+    /// string - One-time use RPC token
+    pub rpc_token: String,
+    /// string - Username to create a guest account with if the user does not have Discord
+    pub username: String,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct GetGuildData {
+    /// string - Guild ID
+    pub guild_id: String,
+    /// integer - Asynchronously get guild with time to wait before timing out
+    pub timeout: i32,
 }

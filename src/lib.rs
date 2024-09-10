@@ -11,7 +11,7 @@ use serde::{Deserialize, Serialize};
 
 use errors::DiscordRPCError;
 pub use ipc::DiscordIpcClient;
-use models::{commands::CommandReturn, events::EventReturn};
+use models::{commands::ReturnedCommand, events::ReturnedEvent};
 pub use utils::*;
 
 pub type Result<T, E = DiscordRPCError> = std::result::Result<T, E>;
@@ -20,7 +20,7 @@ pub type Result<T, E = DiscordRPCError> = std::result::Result<T, E>;
 /// Not all events/commands are implemented so serializing can fail
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(untagged)]
-pub enum ReceivedEvent {
-    Event(Box<EventReturn>),
-    Command(CommandReturn),
+pub enum ReceivedItem {
+    Event(Box<ReturnedEvent>),
+    Command(ReturnedCommand),
 }

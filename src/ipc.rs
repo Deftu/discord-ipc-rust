@@ -1,13 +1,12 @@
 use crate::create_packet_json;
 use crate::ipc_socket::DiscordIpcSocket;
-use crate::models::events::EventReturn;
-use crate::models::rpc_command::RPCCommand;
+use crate::models::events::ReturnedEvent;
+use crate::models::rpc_command::SentCommand;
 use crate::models::shared::User;
 use crate::opcodes::OpCodes;
-use crate::ReceivedEvent;
+use crate::ReceivedItem;
 use crate::Result;
 use serde_json::json;
-use uuid::Uuid;
 
 // Environment keys to search for the Discord pipe
 
@@ -58,7 +57,7 @@ impl DiscordIpcClient {
         // spooky line is not working
         let payload = serde_json::from_str(&payload)?;
         match payload {
-            EventReturn::Ready { data } => {
+            ReturnedEvent::Ready { data } => {
                 println!("Connected to discord and got ready event!");
                 self_user = Some(data.user);
             }
@@ -98,24 +97,7 @@ impl DiscordIpcClient {
     ///
     /// Returns an `Err` variant if sending the handshake failed.
     pub async fn authenticate(&mut self, access_token: &str) -> Result<()> {
-        let nonce = Uuid::new_v4().to_string();
-
-        // TODO: move this to a struct and call send_cmd
-        // self.socket
-        // .send(
-        // &json!({
-        //   "cmd": "AUTHENTICATE",
-        //   "args": {
-        // "access_token": access_token
-        //   },
-        //   "nonce": nonce
-        // })
-        // .to_string(),
-        // OpCodes::Frame as u8,
-        // )
-        // .await?;
-
-        let command = RPCCommand::Authenticate {
+        let command = SentCommand::Authenticate {
             access_token: access_token.to_string(),
         };
 
@@ -136,7 +118,7 @@ impl DiscordIpcClient {
     }
 
     /// send a json string payload to the socket
-    pub async fn emit_command(&mut self, command: &RPCCommand) -> Result<()> {
+    pub async fn emit_command(&mut self, command: &SentCommand) -> Result<()> {
         let mut command_json = command.to_json()?;
         let json_string = &create_packet_json(&mut command_json)?;
         self.socket
@@ -148,14 +130,14 @@ impl DiscordIpcClient {
 
     pub async fn setup_event_handler<F>(&mut self, func: F)
     where
-        F: Fn(ReceivedEvent) + Send + Sync + 'static,
+        F: Fn(ReceivedItem) + Send + Sync + 'static,
     {
         let mut socket_clone = self.socket.clone();
         tokio::spawn(async move {
             loop {
                 let (_opcode, payload) = socket_clone.recv().await.unwrap();
 
-                match serde_json::from_str::<ReceivedEvent>(&payload) {
+                match serde_json::from_str::<ReceivedItem>(&payload) {
                     Ok(e) => {
                         // TODO: give the consumer a ready event so they can sub to events
                         func(e);
