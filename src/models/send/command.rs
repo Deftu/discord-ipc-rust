@@ -8,7 +8,7 @@ use super::event::SubscribeableEvent;
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE", tag = "cmd", content = "args")]
 pub enum SentCommand {
-    Dispatch, // ???
+    Dispatch(SubscribeableEvent), // ???
     Authorize(AuthorizeData),
     Authenticate { access_token: String },
     GetGuild(GetGuildData),
@@ -32,6 +32,30 @@ pub enum SentCommand {
 impl SentCommand {
     pub(crate) fn to_json(&self) -> Result<Value> {
         let command_json = match self {
+            Self::Dispatch(event) => {
+                let mut event_json = serde_json::to_value(event)?;
+                match &mut event_json {
+                    serde_json::Value::Object(object) => {
+                        object.insert("cmd".to_string(), "DISPATCH".into());
+                        object
+                    }
+                    _ => panic!("Expected event to be an object"),
+                };
+                event_json
+            }
+
+            Self::Subscribe(event) => {
+                let mut event_json = serde_json::to_value(event)?;
+                match &mut event_json {
+                    serde_json::Value::Object(object) => {
+                        object.insert("cmd".to_string(), "SUBSCRIBE".into());
+                        object
+                    }
+                    _ => panic!("Expected event to be an object"),
+                };
+                event_json
+            }
+
             Self::Unsubscribe(event) => {
                 let mut event_json = serde_json::to_value(event)?;
                 match &mut event_json {
@@ -44,20 +68,9 @@ impl SentCommand {
                 event_json
             }
 
-            _ => {
-                let value = serde_json::to_value(self)?;
-                println!(
-                    "Created value automatically: {}",
-                    serde_json::to_string_pretty(&value)?
-                );
-                value
-            }
+            _ => serde_json::to_value(self)?,
         };
 
-        println!(
-            "Constructed command JSON: {}",
-            serde_json::to_string_pretty(&command_json)?
-        );
         Ok(command_json)
     }
 }
