@@ -57,7 +57,7 @@ impl DiscordIpcClient {
         // spooky line is not working
         let payload = serde_json::from_str(&payload)?;
         match payload {
-            ReturnedEvent::Ready { data } => {
+            ReturnedEvent::Ready(data) => {
                 println!("Connected to discord and got ready event!");
                 self_user = Some(data.user);
             }
