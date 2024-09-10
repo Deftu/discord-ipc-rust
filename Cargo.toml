@@ -20,8 +20,8 @@ keywords = ["discord", "ipc", "RPC", "client"]
 doctest = false
 
 [dependencies]
-serde = { version = "1.0", features = ["derive"] }
-serde_json = { version = "1.0", features = ["preserve_order"] }
+serde = { version = "1.0.210", features = ["derive"] }
+serde_json = { version = "1.0.128", features = ["preserve_order"] }
 uuid = { version = "0.8", features = ["v4"] }
 tokio = { version = "1.21.1", features = ["full"] }
 thiserror = "1.0.37"
