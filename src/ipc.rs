@@ -101,19 +101,25 @@ impl DiscordIpcClient {
         let nonce = Uuid::new_v4().to_string();
 
         // TODO: move this to a struct and call send_cmd
-        self.socket
-            .send(
-                &json!({
-                  "cmd": "AUTHENTICATE",
-                  "args": {
-                    "access_token": access_token
-                  },
-                  "nonce": nonce
-                })
-                .to_string(),
-                OpCodes::Frame as u8,
-            )
-            .await?;
+        // self.socket
+        // .send(
+        // &json!({
+        //   "cmd": "AUTHENTICATE",
+        //   "args": {
+        // "access_token": access_token
+        //   },
+        //   "nonce": nonce
+        // })
+        // .to_string(),
+        // OpCodes::Frame as u8,
+        // )
+        // .await?;
+
+        let command = RPCCommand::Authenticate {
+            access_token: access_token.to_string(),
+        };
+
+        self.emit_command(&command).await?;
 
         self.socket.recv().await?;
 

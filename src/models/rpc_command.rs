@@ -10,7 +10,7 @@ use super::rpc_event::RPCEvent;
 pub enum RPCCommand {
     Dispatch,
     Authorize,
-    Authenticate,
+    Authenticate { access_token: String },
     GetGuild,
     GetGuilds,
     GetChannel,
@@ -32,7 +32,6 @@ pub enum RPCCommand {
 impl RPCCommand {
     pub(crate) fn to_json(&self) -> Result<Value> {
         let command_json = match self {
-            // Don't know a better way of doing this :/
             Self::Subscribe(event) => {
                 let mut event_json = serde_json::to_value(event)?;
                 match &mut event_json {
@@ -44,7 +43,24 @@ impl RPCCommand {
                 };
                 event_json
             }
-            _ => serde_json::to_value(self)?,
+
+            Self::Unsubscribe(event) => {
+                let mut event_json = serde_json::to_value(event)?;
+                match &mut event_json {
+                    serde_json::Value::Object(object) => {
+                        object.insert("cmd".to_string(), "UNSUBSCRIBE".into());
+                        object
+                    }
+                    _ => panic!("Expected event to be an object"),
+                };
+                event_json
+            }
+
+            _ => {
+                let value = serde_json::to_value(self)?;
+                dbg!(&value);
+                value
+            }
         };
         println!("{}", serde_json::to_string_pretty(&command_json)?);
         Ok(command_json)
