@@ -1,6 +1,6 @@
 [package]
 name = "discord-ipc-rust"
-version = "0.1.0"
+version = "0.1.1"
 authors = [
     "Hacksore <996134+Hacksore@users.noreply.github.com>",
     "Adel-ak <adelkerow@gmail.com>",
