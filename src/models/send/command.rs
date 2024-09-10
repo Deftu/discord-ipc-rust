@@ -1,22 +1,22 @@
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
-use crate::Result;
+use crate::{models::shared::voice_state::VoicePan, Result};
 
-use super::{rpc_event::SentEvent, shared::voice_state::VoicePan};
+use super::event::SubscribeableEvent;
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE", tag = "cmd", content = "args")]
 pub enum SentCommand {
-    Dispatch,
+    Dispatch, // ???
     Authorize(AuthorizeData),
     Authenticate { access_token: String },
     GetGuild(GetGuildData),
     GetGuilds, // No args
     GetChannel { channel_id: String },
     GetChannels { guild_id: String },
-    Subscribe(SentEvent),
-    Unsubscribe(SentEvent),
+    Subscribe(SubscribeableEvent),
+    Unsubscribe(SubscribeableEvent),
     SetUserVoiceSettings(SetUserVoiceSettingsData),
     SelectVoiceChannel(SelectVoiceChannelData),
     GetSelectedVoiceChannel, // No args
