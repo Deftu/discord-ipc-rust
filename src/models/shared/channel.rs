@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use serde_repr::{Deserialize_repr, Serialize_repr};
 
 use super::voice_state::VoiceState;
 
@@ -16,7 +17,8 @@ pub struct Channel {
     pub voice_states: Vec<VoiceState>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize_repr, Deserialize_repr, Debug, PartialEq)]
+#[repr(u32)]
 pub enum ChannelType {
     GuildText = 0,
     DirectMessage = 1,

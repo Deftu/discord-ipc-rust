@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
-use crate::{models::shared::voice_state::VoicePan, Result};
+use crate::{models::shared::SetUserVoiceSettingsData, Result};
 
 use super::event::SubscribeableEvent;
 
@@ -93,18 +93,6 @@ pub struct GetGuildData {
     pub guild_id: String,
     /// integer - Asynchronously get guild with time to wait before timing out
     pub timeout: i32,
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-pub struct SetUserVoiceSettingsData {
-    /// string - User ID
-    pub user_id: String,
-    /// pan object - Set the pan of the user
-    pub pan: Option<VoicePan>,
-    /// integer - Set the volume of the user (defaults to 100, min 0, max 200)
-    pub volume: Option<i32>,
-    /// boolean - Set the mute state of the user
-    pub mute: Option<bool>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
