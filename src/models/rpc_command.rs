@@ -3,7 +3,7 @@ use serde_json::Value;
 
 use crate::Result;
 
-use super::rpc_event::SentEvent;
+use super::{rpc_event::SentEvent, shared::voice_state::VoicePan};
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE", tag = "cmd", content = "args")]
@@ -12,21 +12,21 @@ pub enum SentCommand {
     Authorize(AuthorizeData),
     Authenticate { access_token: String },
     GetGuild(GetGuildData),
-    GetGuilds,
-    GetChannel,
-    GetChannels,
+    GetGuilds, // No args
+    GetChannel { channel_id: String },
+    GetChannels { guild_id: String },
     Subscribe(SentEvent),
     Unsubscribe(SentEvent),
-    SetUserVoiceSettings,
-    SelectVoiceChannel,
-    GetSelectedVoiceChannel,
-    SelectTextChannel,
-    GetVoiceSettings,
-    SetVoiceSettings,
-    SetCertifiedDevices,
-    SetActivity,
-    SendActivityJoinInvite,
-    CloseActivityRequest,
+    SetUserVoiceSettings(SetUserVoiceSettingsData),
+    SelectVoiceChannel(SelectVoiceChannelData),
+    GetSelectedVoiceChannel, // No args
+    SelectTextChannel(SelectTextChannelData),
+    GetVoiceSettings,       // No args
+    SetVoiceSettings,       // !!! CURRENTLY UNSUPPORTED DUE TO LIMITATIONS IMPOSED BY DISCORD !!!
+    SetCertifiedDevices,    // !!! CURRENTLY UNSUPPORTED DUE TO A LACK OF DOCUMENTATION !!!
+    SetActivity,            // TODO
+    SendActivityJoinInvite, // TODO
+    CloseActivityRequest,   // TODO
 }
 
 impl SentCommand {
@@ -58,11 +58,18 @@ impl SentCommand {
 
             _ => {
                 let value = serde_json::to_value(self)?;
-                dbg!(&value);
+                println!(
+                    "Created value automatically: {}",
+                    serde_json::to_string_pretty(&value)?
+                );
                 value
             }
         };
-        println!("{}", serde_json::to_string_pretty(&command_json)?);
+
+        println!(
+            "Constructed command JSON: {}",
+            serde_json::to_string_pretty(&command_json)?
+        );
         Ok(command_json)
     }
 }
@@ -84,5 +91,37 @@ pub struct GetGuildData {
     /// string - Guild ID
     pub guild_id: String,
     /// integer - Asynchronously get guild with time to wait before timing out
+    pub timeout: i32,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct SetUserVoiceSettingsData {
+    /// string - User ID
+    pub user_id: String,
+    /// pan object - Set the pan of the user
+    pub pan: Option<VoicePan>,
+    /// integer - Set the volume of the user (defaults to 100, min 0, max 200)
+    pub volume: Option<i32>,
+    /// boolean - Set the mute state of the user
+    pub mute: Option<bool>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct SelectVoiceChannelData {
+    /// string - Channel ID
+    pub channel_id: String,
+    /// integer - Asynchronously join voice channel with time to wait before timing out
+    pub timeout: i32,
+    /// boolean - Forces a user to join a voice channel
+    pub force: bool,
+    /// boolean - After joining the voice channel, navigate to it in the client
+    pub navigate: bool,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct SelectTextChannelData {
+    /// string - Channel ID
+    pub channel_id: String,
+    /// integer - Asynchronously join text channel with time to wait before timing out
     pub timeout: i32,
 }
