@@ -1,9 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::models::{
-    send::event::SubscribeableEvent,
-    shared::{channel::Channel, Guild, SetUserVoiceSettingsData, User},
-};
+use crate::models::shared::{channel::Channel, Guild, SetUserVoiceSettingsData, User};
 
 /// All command responses that come back from the discord RPC
 #[derive(Serialize, Deserialize, Debug)]
@@ -15,8 +12,8 @@ pub enum ReturnedCommand {
     GetGuilds(Vec<Guild>),
     GetChannel(Channel),
     GetChannels(Vec<Channel>),
-    Subscribe(SubscribeableEvent),
-    Unsuscribe(SubscribeableEvent),
+    Subscribe { evt: String },
+    Unsuscribe { evt: String },
     SetUserVoiceSettings(SetUserVoiceSettingsData),
     SelectVoiceChannel(Channel),
     GetSelectedVoiceChannel(Option<Channel>),
