@@ -9,23 +9,23 @@ use super::ChannelData;
 #[serde(tag = "cmd")]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum CommandReturn {
-  GetSelectedVoiceChannel {
-    data: Option<ChannelData>,
-  },
+    GetSelectedVoiceChannel {
+        data: Option<ChannelData>,
+    },
 
-  /// Get the selected voice channel
-  SelectVoiceChannel {
-    data: ChannelData,
-  },
+    /// Get the selected voice channel
+    SelectVoiceChannel {
+        data: ChannelData,
+    },
 
-  /// Subscribe
-  Subscribe {
-    // TODO: type this
-    data: HashMap<String, String>,
-  },
-  /// Dispatch
-  Dispatch {
-    // TODO: type this
-    data: HashMap<String, String>,
-  },
+    /// Subscribe
+    Subscribe {
+        // TODO: type this
+        data: HashMap<String, String>,
+    },
+    /// Dispatch
+    Dispatch {
+        // TODO: type this
+        data: HashMap<String, String>,
+    },
 }

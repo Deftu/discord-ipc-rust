@@ -15,41 +15,41 @@ use super::ready::ReadyData;
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 /// All events that come back from the discord RPC
 pub enum EventReturn {
-  Ready {
-    data: ReadyData,
-  },
-  Login {
-    data: LoginData,
-  },
-  Error {
-    data: ErrorData,
-  },
+    Ready {
+        data: ReadyData,
+    },
+    Login {
+        data: LoginData,
+    },
+    Error {
+        data: ErrorData,
+    },
 
-  /// speaking start
-  SpeakingStart {
-    data: SpeakingData,
-  },
-  /// speaking stop
-  SpeakingStop {
-    data: SpeakingData,
-  },
+    /// speaking start
+    SpeakingStart {
+        data: SpeakingData,
+    },
+    /// speaking stop
+    SpeakingStop {
+        data: SpeakingData,
+    },
 
-  /// voice state update
-  VoiceStateUpdate {
-    data: VoiceState,
-  },
+    /// voice state update
+    VoiceStateUpdate {
+        data: VoiceState,
+    },
 
-  // TODO: type these payloads
-  GetSelectedVoiceChannel {
-    data: HashMap<String, Value>,
-  },
-  VoiceStateCreate {
-    data: HashMap<String, Value>,
-  },
-  VoiceStateDelete {
-    data: HashMap<String, Value>,
-  },
-  VoiceChannelSelect {
-    data: HashMap<String, Value>,
-  },
+    // TODO: type these payloads
+    GetSelectedVoiceChannel {
+        data: HashMap<String, Value>,
+    },
+    VoiceStateCreate {
+        data: HashMap<String, Value>,
+    },
+    VoiceStateDelete {
+        data: HashMap<String, Value>,
+    },
+    VoiceChannelSelect {
+        data: HashMap<String, Value>,
+    },
 }

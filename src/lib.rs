@@ -21,6 +21,6 @@ pub type Result<T, E = DiscordRPCError> = std::result::Result<T, E>;
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(untagged)]
 pub enum EventReceive {
-  Event(Box<EventReturn>),
-  Command(CommandReturn),
+    Event(Box<EventReturn>),
+    Command(CommandReturn),
 }
