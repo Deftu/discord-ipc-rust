@@ -1,5 +1,6 @@
 pub mod channel;
 pub mod guild;
+pub mod message;
 pub mod user;
 pub mod voice_settings;
 pub mod voice_state;

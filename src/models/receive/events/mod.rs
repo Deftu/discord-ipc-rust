@@ -1,6 +1,10 @@
 use serde::{Deserialize, Serialize};
 
-use crate::models::shared::{voice_state::VoiceState, User};
+use crate::models::shared::{
+    message::{DeletedMessage, Message},
+    voice_state::VoiceState,
+    User,
+};
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE", tag = "evt", content = "data")]
@@ -19,9 +23,18 @@ pub enum ReturnedEvent {
     VoiceConnectionStatus(VoiceConnectionStatusData),
     SpeakingStart(SpeakingData),
     SpeakingStop(SpeakingData),
-    MessageCreate,
-    MessageUpdate,
-    MessageDelete,
+    MessageCreate {
+        channel_id: String,
+        message: Message,
+    },
+    MessageUpdate {
+        channel_id: String,
+        message: Message,
+    },
+    MessageDelete {
+        channel_id: String,
+        message: DeletedMessage,
+    },
     NotificationCreate,
     ActivityJoin,
     ActivitySpectate,

@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use serde_repr::{Deserialize_repr, Serialize_repr};
 
-use super::voice_state::VoiceState;
+use super::{message::Message, voice_state::VoiceState};
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Channel {
@@ -15,6 +15,7 @@ pub struct Channel {
     pub guild_id: String,
     pub position: u32,
     pub voice_states: Vec<VoiceState>,
+    pub messages: Vec<Message>,
 }
 
 #[derive(Serialize_repr, Deserialize_repr, Debug, PartialEq)]
