@@ -32,18 +32,6 @@ pub enum SentCommand {
 impl SentCommand {
     pub(crate) fn to_json(&self) -> Result<Value> {
         let command_json = match self {
-            Self::Subscribe(event) => {
-                let mut event_json = serde_json::to_value(event)?;
-                match &mut event_json {
-                    serde_json::Value::Object(object) => {
-                        object.insert("cmd".to_string(), "SUBSCRIBE".into());
-                        object
-                    }
-                    _ => panic!("Expected event to be an object"),
-                };
-                event_json
-            }
-
             Self::Unsubscribe(event) => {
                 let mut event_json = serde_json::to_value(event)?;
                 match &mut event_json {
