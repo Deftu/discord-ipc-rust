@@ -11,18 +11,18 @@ pub enum SubscribeableEvent {
     VoiceStateCreate { channel_id: String },
     VoiceStateUpdate { channel_id: String },
     VoiceStateDelete { channel_id: String },
-    VoiceSettingsUpdate, // No args
-    VoiceConnectionStatus,
+    VoiceSettingsUpdate,   // No args
+    VoiceConnectionStatus, // No args
     SpeakingStart { channel_id: String },
     SpeakingStop { channel_id: String },
-    MessageCreate,
-    MessageUpdate,
-    MessageDelete,
-    NotificationCreate,
-    ActivityJoin,
-    ActivitySpectate,
-    ActivityJoinRequest,
-    CurrentUserUpdate,
+    MessageCreate { channel_id: String },
+    MessageUpdate { channel_id: String },
+    MessageDelete { channel_id: String },
+    NotificationCreate,  // No args
+    ActivityJoin,        // No args
+    ActivitySpectate,    // No args
+    ActivityJoinRequest, // No args
+    CurrentUserUpdate,   // No args
 }
 
 #[derive(Serialize, Deserialize, Debug)]
