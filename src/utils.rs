@@ -2,12 +2,11 @@ use crate::Result;
 use serde_json::Value;
 use std::collections::HashSet;
 use std::convert::TryInto;
-use std::env::var;
 use std::path::Path;
 use std::path::PathBuf;
 use uuid::Uuid;
 
-pub fn create_json(value: &mut serde_json::Value) -> Result<String> {
+pub fn create_packet_json(value: &mut serde_json::Value) -> Result<String> {
     let uuid = Uuid::new_v4().to_string();
 
     let payload = value.as_object_mut().expect("payload must be an object");
@@ -40,36 +39,54 @@ pub fn unpack(data: Vec<u8>) -> Result<(u32, u32)> {
 
 /// Finds the discord IPC pipe path
 pub fn get_pipe_path() -> Option<PathBuf> {
-    let mut possible_paths = HashSet::new();
-
-    #[cfg(target_os = "windows")]
-    possible_paths.insert(r"\\?\pipe\discord-ipc-".to_string());
-
-    #[cfg(target_family = "unix")]
-    possible_paths.insert("/tmp/discord-ipc-".to_string());
-
-    // this is for darwin who has crazy paths like
-    // /var/folders/1v/n6w12pg1455gyd172wxd9b2r0000gn/T/discord-ipc-0
-    if let Ok(runtime_dir) = var("TMPDIR") {
-        possible_paths.insert(runtime_dir + "/discord-ipc-");
-    }
-
-    if let Ok(runtime_dir) = var("XDG_RUNTIME_DIR") {
-        // Flatpak installed Discord
-        possible_paths.insert(runtime_dir.clone() + "/app/com.discordapp.Discord/discord-ipc-");
-        // Non-Flatpak installed Discord
-        possible_paths.insert(runtime_dir + "/discord-ipc-");
-    }
+    let possible_paths = get_os_pipe_paths();
 
     for i in 0..10 {
         for p in &possible_paths {
             let path: String = format!("{}{}", p, i);
+            let path = Path::new(&path);
 
-            if Path::new(&path).exists() {
-                return Some(Path::new(&path).to_path_buf());
+            if path.exists() {
+                return Some(path.to_path_buf());
             }
         }
     }
 
     None
+}
+
+#[cfg(target_os = "windows")]
+fn get_os_pipe_paths() -> HashSet<String> {
+    let mut possible_paths = HashSet::new();
+    possible_paths.insert(r"\\?\pipe\discord-ipc-".to_string());
+    possible_paths
+}
+
+#[cfg(target_family = "unix")]
+fn get_os_pipe_paths() -> HashSet<String> {
+    use std::env::var;
+
+    let mut possible_paths = HashSet::new();
+    possible_paths.insert("/tmp/discord-ipc-".to_string());
+    if let Ok(runtime_dir) = var("XDG_RUNTIME_DIR") {
+        // Flatpak installed Discord
+        possible_paths.insert(runtime_dir.clone() + "/app/com.discordapp.Discord/discord-ipc-");
+
+        // Non-Flatpak installed Discord
+        possible_paths.insert(runtime_dir + "/discord-ipc-");
+    }
+
+    possible_paths
+}
+
+#[cfg(target_os = "darwin")]
+fn get_os_pipe_paths() -> HashSet<String> {
+    use std::env::var;
+
+    let mut possible_paths = HashSet::new();
+    if let Ok(runtime_dir) = var("TMPDIR") {
+        possible_paths.insert(runtime_dir + "/discord-ipc-");
+    }
+
+    possible_paths
 }

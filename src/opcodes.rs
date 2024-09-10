@@ -1,7 +1,7 @@
 #![allow(missing_docs)]
 
 // Opcodes used by the discord client
-pub enum OPCODES {
+pub enum OpCodes {
     /// This is to connect to discord
     Handshake,
 
