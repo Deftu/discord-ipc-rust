@@ -47,8 +47,6 @@ impl DiscordIpcClient {
     /// This method attempts to first establish a connection,
     /// and then sends a handshake
     async fn create_connection(&mut self) -> Result<User> {
-        println!("Connecting to client...");
-
         self.send_handshake().await?;
 
         let (_opcode, payload) = self.socket.recv().await?;
@@ -58,7 +56,6 @@ impl DiscordIpcClient {
         let payload = serde_json::from_str(&payload)?;
         match payload {
             ReturnedEvent::Ready(data) => {
-                println!("Connected to discord and got ready event!");
                 self_user = Some(data.user);
             }
             _ => {
@@ -143,7 +140,7 @@ impl DiscordIpcClient {
                         func(e);
                     }
                     Err(err) => {
-                        println!("Unable to deserialize {:?}", err);
+                        println!("Unable to deserialize {:?}\n{:?}", err, payload);
                     }
                 }
             }

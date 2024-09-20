@@ -1,3 +1,4 @@
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
 use crate::models::shared::{
@@ -95,12 +96,12 @@ pub struct VoiceConnectionStatusData {
     pub state: VoiceConnectionState,
     /// string - Hostname of the connected voice server
     pub hostname: String,
-    /// array of integers - Last 20 pings (in ms)
-    pub pings: Vec<u64>,
-    /// integer - Average ping (in ms)
-    pub average_ping: u64,
+    /// array of PingData - Last 20 pings (in ms)
+    pub pings: Vec<PingData>,
+    /// float - Average ping (in ms)
+    pub average_ping: f64, // Adjusted to f64 to match the float value in the JSON
     /// integer - Last ping (in ms)
-    pub last_ping: u64,
+    pub last_ping: Option<u64>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -116,6 +117,13 @@ pub enum VoiceConnectionState {
     VoiceConnected,
     NoRoute,
     IceChecking,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct PingData {
+    #[serde(with = "chrono::serde::ts_milliseconds")]
+    pub time: DateTime<Utc>,
+    pub value: u64,
 }
 
 #[derive(Serialize, Deserialize, Debug)]

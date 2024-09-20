@@ -24,6 +24,7 @@ serde = { version = "1.0.210", features = ["derive"] }
 serde_json = { version = "1.0.128", features = ["preserve_order"] }
 serde_repr = "0.1.19"
 uuid = { version = "0.8", features = ["v4"] }
+chrono = { version = "0.4.38", features = ["serde"] }
 tokio = { version = "1.21.1", features = ["full"] }
 thiserror = "1.0.37"
 # TODO: we don't need this as a hard dep
